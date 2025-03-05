@@ -52,7 +52,7 @@ def get_excel_stats(file_path: str) -> Optional[Dict[str, Union[str, int, List[s
 
 # 使用示例  
 if __name__ == "__main__":  
-    excel_path = "./../testdata/测算表.xlsx"  
+    excel_path = "./../testdata/测试表.xlsx"  
     result = get_excel_stats(excel_path)  
     
     if result:  
