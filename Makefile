@@ -1,4 +1,4 @@
 all: run
 
 run:
-	uv run main.py
+	uv run ui.py

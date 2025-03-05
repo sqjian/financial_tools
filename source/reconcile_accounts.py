@@ -3,9 +3,12 @@ from collections import defaultdict
 
 
 def reconcile_accounts(file_path, col_a_name, col_b_name, sheet_name=0):
+    output = []  # 用于收集输出内容的列表
+
     try:
         # 读取Excel文件
         df = pd.read_excel(file_path, sheet_name=sheet_name)
+        output.append(f"成功读取文件: {file_path}")
 
         # 校验必要列
         if not all(col in df.columns for col in [col_a_name, col_b_name]):
@@ -27,6 +30,7 @@ def reconcile_accounts(file_path, col_a_name, col_b_name, sheet_name=0):
 
         col_a = preprocess_column(col_a_name)
         col_b = preprocess_column(col_b_name)
+        output.append(f"预处理完成 | A列({col_a_name})记录数: {len(col_a)} | B列({col_b_name})记录数: {len(col_b)}")
 
         # 阶段1：精确匹配
         a_amount_map = defaultdict(list)
@@ -108,62 +112,47 @@ def reconcile_accounts(file_path, col_a_name, col_b_name, sheet_name=0):
                 remaining_b.remove(b_item)
 
         # 收集最终结果
-        all_matches = exact_matches + combo_matches
         unmatched_a = a_available
         unmatched_b = remaining_b
 
-        # 转换金额显示
-        def format_amount(amount_cents):
-            return round(amount_cents / 100, 2)
-
-        # 打印详细结果
-        print("\n=== 匹配明细 ===")
+        # 构建结果字符串
+        output.append("\n=== 匹配明细 ===")
         exact_count = len(exact_matches)
-        print(f"精确匹配数量: {exact_count}笔")
+        output.append(f"精确匹配数量: {exact_count}笔")
         for match in combo_matches:
-            print(
-                f"组合匹配 | {col_a_name}=>行号: {match['a_rows']} | {col_b_name}=>行号: {match['b_row']} | 总金额: {match['amount']}"
+            output.append(
+                f"组合匹配 | {col_a_name}=>行号: {match['a_rows']} | {col_b_name}=>行号: {match['b_row']} | 总金额: {match['amount']:.2f}"
             )
 
-        print("\n=== 未匹配明细 ===")
+        output.append("\n=== 未匹配明细 ===")
         # 处理A列未匹配项
-        print("A列未匹配项：")
+        output.append("A列未匹配项：")
         for item in unmatched_a:
             row_num = item["row"]
             row_idx = row_num - 2  # 转换为pandas索引
             if row_idx < 0 or row_idx >= len(df):
-                print(f"行号 {row_num} 超出数据范围")
+                output.append(f"行号 {row_num} 超出数据范围")
                 continue
             row_data = df.iloc[row_idx]
             non_empty = {col: val for col, val in row_data.items() if pd.notnull(val)}
             details = ", ".join([f"{col}: {val}" for col, val in non_empty.items()])
-            print(f"行号: {row_num} | {details}")
+            output.append(f"行号: {row_num} | {details}")
 
         # 处理B列未匹配项
-        print("\nB列未匹配项：")
+        output.append("\nB列未匹配项：")
         for item in unmatched_b:
             row_num = item["row"]
             row_idx = row_num - 2
             if row_idx < 0 or row_idx >= len(df):
-                print(f"行号 {row_num} 超出数据范围")
+                output.append(f"行号 {row_num} 超出数据范围")
                 continue
             row_data = df.iloc[row_idx]
             non_empty = {col: val for col, val in row_data.items() if pd.notnull(val)}
             details = ", ".join([f"{col}: {val}" for col, val in non_empty.items()])
-            print(f"行号: {row_num} | {details}")
+            output.append(f"行号: {row_num} | {details}")
 
-        return {
-            "matches": all_matches,
-            "unmatched_a": [
-                {"row": x["row"], "amount": format_amount(x["amount"])}
-                for x in unmatched_a
-            ],
-            "unmatched_b": [
-                {"row": x["row"], "amount": format_amount(x["amount"])}
-                for x in unmatched_b
-            ],
-        }
+        return "\n".join(output)
 
     except Exception as e:
-        print(f"错误: {str(e)}")
-        return None
+        output.append(f"错误: {str(e)}")
+        return "\n".join(output)
