@@ -57,6 +57,9 @@ class App(tk.Tk):
 
     def _load_file_b(self):
         """加载甲方文件"""
+        print(f"1->self.combo_a.get():{self.combo_a.get()}")
+        print(f"1->self.combo_b.get():{self.combo_b.get()}")
+
         file_path = tk.filedialog.askopenfilename(title="选择乙方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
         self.table_b_file_path = file_path  # 保存文件路径
         print(self.table_b_file_path)
@@ -70,6 +73,9 @@ class App(tk.Tk):
 
     def _on_combo_b_select(self, event=None):
         """当下拉框的值变化时触发的事件"""
+        print(f"2->self.combo_a.get():{self.combo_a.get()}")
+        print(f"2->self.combo_b.get():{self.combo_b.get()}")
+
         selected_value = self.combo_b.get()  # 获取当前选中的值
         print(f"选中的值: {selected_value}")
         table_cols = get_excel_cols(self.table_b_file_path, selected_value)
