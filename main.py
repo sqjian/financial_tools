@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, filedialog  # 添加ttk导入
 
+from source.get_excel_stats import get_excel_stats
+
 
 class App(tk.Tk):
     """主应用程序类，继承自tk.Tk"""
@@ -38,6 +40,9 @@ class App(tk.Tk):
         file_path = tk.filedialog.askopenfilename(title="选择甲方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
         if file_path:
             # 读取文件内容
+            result = get_excel_stats(file_path)
+            print(result)
+            self.lb_a.insert(tk.END, result['sheet_names'])
             pass
 
     def _create_file_loader(self):
@@ -51,10 +56,10 @@ class App(tk.Tk):
         # 甲方文件加载控件
         btn_a = ttk.Button(frame, text="加载甲方表", command=self._load_file_a)
         btn_a.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
-        lb_a = tk.Listbox(frame, height=1)
-        lb_a.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
-        lbl_a = ttk.Label(frame, text="", relief="sunken", anchor=tk.W)
-        lbl_a.grid(row=0, column=2, padx=5, pady=10, sticky=tk.EW)
+        self.lb_a = tk.Listbox(frame, height=1)
+        self.lb_a.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
+        self.lbl_a = ttk.Label(frame, text="", relief="sunken", anchor=tk.W)
+        self.lbl_a.grid(row=0, column=2, padx=5, pady=10, sticky=tk.EW)
 
         # 乙方加载控件
         btn_b = ttk.Button(frame, text="加载乙方表")
