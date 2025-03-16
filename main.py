@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog  # 添加ttk导入
 
 from source.get_excel_stats import get_excel_stats
+from source.get_excel_cols import get_excel_cols
 
 
 class App(tk.Tk):
@@ -38,12 +39,41 @@ class App(tk.Tk):
     def _load_file_a(self):
         """加载甲方文件"""
         file_path = tk.filedialog.askopenfilename(title="选择甲方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
+        self.table_a_file_path = file_path  # 保存文件路径
         if file_path:
-            # 读取文件内容
             result = get_excel_stats(file_path)
-            print(result)
-            self.lb_a.insert(tk.END, result['sheet_names'])
-            pass
+            sheet_names = result["sheet_names"]
+            self.combo_a["values"] = sheet_names
+            if sheet_names:
+                self.combo_a.current(0)  # 默认选中第一个
+                self._on_combo_a_select()  # 触发选中事件
+
+    def _on_combo_a_select(self, event=None):
+        """当下拉框的值变化时触发的事件"""
+        selected_value = self.combo_a.get()  # 获取当前选中的值
+        print(f"选中的值: {selected_value}")
+        table_cols = get_excel_cols(self.table_a_file_path, selected_value)
+        self.lbl_a.config(text=f"{selected_value} 共有 {len(table_cols)}列")
+
+    def _load_file_b(self):
+        """加载甲方文件"""
+        file_path = tk.filedialog.askopenfilename(title="选择乙方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
+        self.table_b_file_path = file_path  # 保存文件路径
+        print(self.table_b_file_path)
+        if file_path:
+            result = get_excel_stats(file_path)
+            sheet_names = result["sheet_names"]
+            self.combo_b["values"] = sheet_names
+            if sheet_names:
+                self.combo_b.current(0)  # 默认选中第一个
+                self._on_combo_b_select()  # 触发选中事件
+
+    def _on_combo_b_select(self, event=None):
+        """当下拉框的值变化时触发的事件"""
+        selected_value = self.combo_b.get()  # 获取当前选中的值
+        print(f"选中的值: {selected_value}")
+        table_cols = get_excel_cols(self.table_b_file_path, selected_value)
+        self.lbl_b.config(text=f"{selected_value} 共有 {len(table_cols)}列")
 
     def _create_file_loader(self):
         """创建文件加载区域组件"""
@@ -56,18 +86,20 @@ class App(tk.Tk):
         # 甲方文件加载控件
         btn_a = ttk.Button(frame, text="加载甲方表", command=self._load_file_a)
         btn_a.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
-        self.lb_a = tk.Listbox(frame, height=1)
-        self.lb_a.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
-        self.lbl_a = ttk.Label(frame, text="", relief="sunken", anchor=tk.W)
+        self.combo_a = ttk.Combobox(frame, state="readonly")
+        self.combo_a.bind("<<ComboboxSelected>>", self._on_combo_a_select)
+        self.combo_a.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
+        self.lbl_a = ttk.Label(frame, text="甲方表的基本统计信息", relief="sunken", anchor=tk.W)
         self.lbl_a.grid(row=0, column=2, padx=5, pady=10, sticky=tk.EW)
 
         # 乙方加载控件
-        btn_b = ttk.Button(frame, text="加载乙方表")
+        btn_b = ttk.Button(frame, text="加载乙方表", command=self._load_file_b)
         btn_b.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W)
-        lb_b = tk.Listbox(frame, height=1)
-        lb_b.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
-        lbl_b = ttk.Label(frame, text="乙方表的基本统计信息", relief="sunken", anchor=tk.W)
-        lbl_b.grid(row=1, column=2, padx=5, pady=10, sticky=tk.EW)
+        self.combo_b = ttk.Combobox(frame, state="readonly")
+        self.combo_b.bind("<<ComboboxSelected>>", self._on_combo_b_select)
+        self.combo_b.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
+        self.lbl_b = ttk.Label(frame, text="乙方表的基本统计信息", relief="sunken", anchor=tk.W)
+        self.lbl_b.grid(row=1, column=2, padx=5, pady=10, sticky=tk.EW)
 
     def _create_group_conditions(self):
         """创建分组条件区域组件"""
