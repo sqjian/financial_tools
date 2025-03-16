@@ -1,13 +1,11 @@
-all: clean dev
+all: clean run
 
 run:
 	uv run main.py
 
-dev:
-	uv run dev.py
-
 clean:
 	cls
+
 pack:
 	uv run pyinstaller \
 		--onefile \
