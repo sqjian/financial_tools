@@ -8,6 +8,7 @@ class App(tk.Tk):
         """初始化应用程序窗口"""
         super().__init__()  # 调用父类构造函数
         self.title("对账工具")  # 设置窗口标题
+        self.geometry("800x500")  # 设置初始窗口尺寸
         self._configure_grid()  # 配置网格布局管理器
         self._create_widgets()  # 创建所有界面组件
 
@@ -31,7 +32,9 @@ class App(tk.Tk):
         """创建文件加载区域组件"""
         frame = tk.LabelFrame(self, text="文件加载", padx=10, pady=10)
         frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky=tk.NSEW)
-        
+        frame.columnconfigure(0, weight=1)  # 左侧列扩展
+        frame.columnconfigure(1, weight=10)  # 右侧列扩展
+
         # 甲方文件加载控件
         btn_a = tk.Button(frame, text="加载甲方表", width=15)  # 加载按钮
         btn_a.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)  # 左侧对齐
