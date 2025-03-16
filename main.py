@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk  # 添加ttk导入
+from tkinter import ttk, filedialog  # 添加ttk导入
+
 
 class App(tk.Tk):
     """主应用程序类，继承自tk.Tk"""
@@ -32,26 +33,36 @@ class App(tk.Tk):
         self._create_group_conditions()  # 创建分组条件区域
         self._create_result_display()  # 创建结果显示区域
 
+    def _load_file_a(self):
+        """加载甲方文件"""
+        file_path = tk.filedialog.askopenfilename(title="选择甲方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
+        if file_path:
+            # 读取文件内容
+            pass
+
     def _create_file_loader(self):
         """创建文件加载区域组件"""
         frame = ttk.LabelFrame(self, text="文件加载", padding=(10, 10))
         frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky=tk.NSEW)
         frame.columnconfigure(0, weight=1)
-        frame.columnconfigure(1, weight=10)
+        frame.columnconfigure(1, weight=1)
+        frame.columnconfigure(2, weight=10)
 
         # 甲方文件加载控件
-        btn_a = ttk.Button(frame, text="加载甲方表")
+        btn_a = ttk.Button(frame, text="加载甲方表", command=self._load_file_a)
         btn_a.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
+        lb_a = tk.Listbox(frame, height=1)
+        lb_a.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
+        lbl_a = ttk.Label(frame, text="", relief="sunken", anchor=tk.W)
+        lbl_a.grid(row=0, column=2, padx=5, pady=10, sticky=tk.EW)
 
-        # 甲方文件信息标签
-        lbl_a = ttk.Label(frame, text="甲方表的基本统计信息", relief="sunken", anchor=tk.W)
-        lbl_a.grid(row=0, column=1, padx=5, pady=10, sticky=tk.EW)
-
-        # 乙方文件加载控件
+        # 乙方加载控件
         btn_b = ttk.Button(frame, text="加载乙方表")
         btn_b.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W)
+        lb_b = tk.Listbox(frame, height=1)
+        lb_b.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
         lbl_b = ttk.Label(frame, text="乙方表的基本统计信息", relief="sunken", anchor=tk.W)
-        lbl_b.grid(row=1, column=1, padx=5, pady=10, sticky=tk.EW)
+        lbl_b.grid(row=1, column=2, padx=5, pady=10, sticky=tk.EW)
 
     def _create_group_conditions(self):
         """创建分组条件区域组件"""
