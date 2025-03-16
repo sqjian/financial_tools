@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog  # 添加ttk导入
 
 from source.get_excel_stats import get_excel_stats
-from source.get_excel_cols import get_excel_cols
+from source.load_excel_to_table import load_excel_to_table
 
 
 class App(tk.Tk):
@@ -13,7 +13,7 @@ class App(tk.Tk):
         super().__init__()  # 调用父类构造函数
 
         style = ttk.Style()
-        style.theme_use("xpnative")
+        style.theme_use("default")
 
         self.title("对账工具")  # 设置窗口标题
         self.geometry("800x500")  # 设置初始窗口尺寸
@@ -48,17 +48,34 @@ class App(tk.Tk):
                 self.combo_a.current(0)  # 默认选中第一个
                 self._on_combo_a_select()  # 触发选中事件
 
+    def get_table_cols_from_db_conn(self, conn, table_name):
+        """从数据库连接中获取表的列名"""
+        columns_info = conn.sql(f"PRAGMA table_info('{table_name}');".strip()).fetchall()
+
+        column_names = [column[1] for column in columns_info]
+
+        return column_names
+
     def _on_combo_a_select(self, event=None):
         """当下拉框的值变化时触发的事件"""
+
         selected_value = self.combo_a.get()  # 获取当前选中的值
         print(f"选中的值: {selected_value}")
-        table_cols = get_excel_cols(self.table_a_file_path, selected_value)
+        self.part_a_conn = load_excel_to_table(self.table_a_file_path, selected_value, "part_a")
+        table_cols = self.get_table_cols_from_db_conn(self.part_a_conn, "part_a")
         self.lbl_a.config(text=f"{selected_value} 共有 {len(table_cols)}列")
+
+        if len(self.combo_b.get()):
+            print("乙方表已经加载，可以开始对账")
+            for col in table_cols:
+                self.group1.insert(tk.END, col)
+                self.group2.insert(tk.END, col)
+                self.group3.insert(tk.END, col)
+        else:
+            print("乙方表未加载，无法开始对账")
 
     def _load_file_b(self):
         """加载甲方文件"""
-        print(f"1->self.combo_a.get():{self.combo_a.get()}")
-        print(f"1->self.combo_b.get():{self.combo_b.get()}")
 
         file_path = tk.filedialog.askopenfilename(title="选择乙方文件", filetypes=[("Excel files", "*.xlsx *.xls")])
         self.table_b_file_path = file_path  # 保存文件路径
@@ -73,13 +90,21 @@ class App(tk.Tk):
 
     def _on_combo_b_select(self, event=None):
         """当下拉框的值变化时触发的事件"""
-        print(f"2->self.combo_a.get():{self.combo_a.get()}")
-        print(f"2->self.combo_b.get():{self.combo_b.get()}")
 
         selected_value = self.combo_b.get()  # 获取当前选中的值
         print(f"选中的值: {selected_value}")
-        table_cols = get_excel_cols(self.table_b_file_path, selected_value)
+        self.part_b_conn = load_excel_to_table(self.table_b_file_path, selected_value, "part_b")
+        table_cols = self.get_table_cols_from_db_conn(self.part_b_conn, "part_b")
         self.lbl_b.config(text=f"{selected_value} 共有 {len(table_cols)}列")
+
+        if len(self.combo_a.get()):
+            print("甲方表已经加载，可以开始对账")
+            for col in table_cols:
+                self.group1.insert(tk.END, col)
+                self.group2.insert(tk.END, col)
+                self.group3.insert(tk.END, col)
+        else:
+            print("甲方表未加载，无法开始对账")
 
     def _create_file_loader(self):
         """创建文件加载区域组件"""

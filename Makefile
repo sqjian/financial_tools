@@ -4,7 +4,7 @@ run:
 	uv run main.py
 
 clean:
-	cls
+	clear
 
 pack:
 	uv run pyinstaller \
