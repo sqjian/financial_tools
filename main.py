@@ -127,6 +127,27 @@ class App(tk.Tk):
         # 配置列权重
         frame.columnconfigure(2, weight=1)
 
+    def _on_start_reconciliation_button_click(self):
+        """开始对账按钮点击事件"""
+        group1_col = self.group1.get()
+        group2_col = self.group2.get()
+        group3_col = self.group3.get()
+
+        print(f"对账开始：group1_col:{group1_col}, group2_col:{group2_col}, group3_col:{group3_col}")
+
+        # 从数据库中获取数据
+        part_a_data = self.part_a_conn.sql(f"SELECT {group1_col}, {group2_col}, {group3_col} FROM part_a").fetchall()
+        part_b_data = self.part_b_conn.sql(f"SELECT {group1_col}, {group2_col}, {group3_col} FROM part_b").fetchall()
+
+        print(f"part_a_data_len: {len(part_a_data)}")
+        print(f"part_b_data_len: {len(part_b_data)}")
+
+        # 对账逻辑
+        # result = self.reconcile(part_a_data, part_b_data)
+
+        # 显示对账结果
+        self.update_result_text(group1_col)
+
     def _create_group_conditions(self):
         """创建分组条件区域"""
         frame = ttk.LabelFrame(self, text="分组条件", padding=10)
@@ -147,7 +168,7 @@ class App(tk.Tk):
 
         # 开始对账按钮 - 跨两行以与下拉框对齐
         ttk.Label(frame, text="").grid(row=0, column=3)  # 空标签保持对齐
-        ttk.Button(frame, text="开始对账").grid(row=1, column=3, sticky="ew", padx=5)
+        ttk.Button(frame, text="开始对账", command=self._on_start_reconciliation_button_click).grid(row=1, column=3, sticky="ew", padx=5)
 
     def _create_group_combo(self, parent, title, column):
         """创建单个分组下拉框"""
@@ -163,15 +184,20 @@ class App(tk.Tk):
         frame = ttk.LabelFrame(self, text="对账结果", padding=10)
         frame.grid(row=2, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
 
-        text = tk.Text(frame, wrap="word")
-        scrollbar = ttk.Scrollbar(frame, command=text.yview)
-        text.config(yscrollcommand=scrollbar.set)
+        self.result_text = tk.Text(frame, wrap="word")
+        scrollbar = ttk.Scrollbar(frame, command=self.result_text.yview)
+        self.result_text.config(yscrollcommand=scrollbar.set)
 
-        text.grid(row=0, column=0, sticky="nsew")
+        self.result_text.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
+
+    def update_result_text(self, content):
+        """更新结果文本框内容"""
+        self.result_text.delete(1.0, tk.END)  # 清除现有内容
+        self.result_text.insert(tk.END, str(content))  # 插入新内容
 
 
 if __name__ == "__main__":
