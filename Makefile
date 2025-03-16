@@ -1,7 +1,7 @@
 all: run
 
 run:
-	uv run ui.py
+	uv run main.py
 
 pack:
 	uv run pyinstaller \
@@ -9,4 +9,4 @@ pack:
 		--icon=res/doraemon.ico \
 		--noconsole \
 		--name="doraemon.exe" \
-		ui.py
+		main.py

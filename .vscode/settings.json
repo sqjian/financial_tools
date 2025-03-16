@@ -1,0 +1,21 @@
+{
+    "files.watcherExclude": {
+        "**/.venv": true,
+        "**/.conda": true,
+        "**/models": true,
+        "**/node_modules": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/data": true
+    },
+    "terminal.integrated.env.linux": {
+        "HTTP_PROXY": "http://127.0.0.1:7890",
+        "HTTPS_PROXY": "http://127.0.0.1:7890",
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "jupyter.debugJustMyCode": false,
+    "black-formatter.args": [
+        "--line-length",
+        "240"
+    ]
+}

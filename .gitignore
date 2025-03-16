@@ -10,3 +10,4 @@ wheels/
 .venv
 ui.build
 ui.dist
+.DS_Store
