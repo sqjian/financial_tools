@@ -146,17 +146,17 @@ class App(tk.Tk):
         rich.print(part_b_group_col_rst)
 
         exit_flag = False
-        for group1 in part_a_group_col_rst["group1_col"]:
-            for group2 in part_a_group_col_rst["group2_col"]:
-                for group3 in part_a_group_col_rst["group3_col"]:
+        for group1_col_val in part_a_group_col_rst["group1_col"]:
+            for group2_col_val in part_a_group_col_rst["group2_col"]:
+                for group3_col_val in part_a_group_col_rst["group3_col"]:
                     if exit_flag:
                         break
-                    list_a = get_group_data(self.part_a_conn, "part_a", "统一仓库", group1, "统一名称", group2, "统一日期", group3, "收货数量")
-                    list_b = get_group_data(self.part_b_conn, "part_b", "统一仓库", group1, "统一名称", group2, "统一日期", group3, "实发数量")
+                    list_a = get_group_data(self.part_a_conn, "part_a", group1_col, group1_col_val, group2_col, group2_col_val, group3_col, group3_col_val, "收货数量")
+                    list_b = get_group_data(self.part_b_conn, "part_b", group1_col, group1_col_val, group2_col, group2_col_val, group3_col, group3_col_val, "实发数量")
                     rst = reconcile_lists(list_a, list_b)
                     rich.print(rst)
                     if len(rst["exact_matches"]) == 0 and len(rst["combo_matches_a_to_b"]) == 0 and len(rst["combo_matches_b_to_a"]) == 0 and len(rst["unmatched_a"]) == 0 and len(rst["unmatched_b"]) == 0:
-                        print(group1, group2, group3)
+                        print(group1_col_val, group2_col_val, group3_col_val)
                         exit_flag = True
                         break
         # 对账逻辑
