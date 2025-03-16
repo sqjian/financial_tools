@@ -1,7 +1,10 @@
-all: run
+all: dev
 
 run:
 	uv run main.py
+
+dev:
+	uv run dev.py
 
 pack:
 	uv run pyinstaller \
