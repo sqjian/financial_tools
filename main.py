@@ -1,3 +1,7 @@
+import rich
+from source.get_group_conditions import get_group_conditions
+from source.reconcile_lists import reconcile_lists
+from source.get_group_data import get_group_data
 import tkinter as tk
 from tkinter import ttk, filedialog
 from source.get_excel_stats import get_excel_stats
@@ -135,13 +139,26 @@ class App(tk.Tk):
 
         print(f"对账开始：group1_col:{group1_col}, group2_col:{group2_col}, group3_col:{group3_col}")
 
-        # 从数据库中获取数据
-        part_a_data = self.part_a_conn.sql(f"SELECT {group1_col}, {group2_col}, {group3_col} FROM part_a").fetchall()
-        part_b_data = self.part_b_conn.sql(f"SELECT {group1_col}, {group2_col}, {group3_col} FROM part_b").fetchall()
+        part_a_group_col_rst = get_group_conditions(self.part_a_conn, "part_a", group1_col, group2_col, group3_col)
+        part_b_group_col_rst = get_group_conditions(self.part_b_conn, "part_b", group1_col, group2_col, group3_col)
 
-        print(f"part_a_data_len: {len(part_a_data)}")
-        print(f"part_b_data_len: {len(part_b_data)}")
+        rich.print(part_a_group_col_rst)
+        rich.print(part_b_group_col_rst)
 
+        exit_flag = False
+        for group1 in part_a_group_col_rst["group1_col"]:
+            for group2 in part_a_group_col_rst["group2_col"]:
+                for group3 in part_a_group_col_rst["group3_col"]:
+                    if exit_flag:
+                        break
+                    list_a = get_group_data(self.part_a_conn, "part_a", "统一仓库", group1, "统一名称", group2, "统一日期", group3, "收货数量")
+                    list_b = get_group_data(self.part_b_conn, "part_b", "统一仓库", group1, "统一名称", group2, "统一日期", group3, "实发数量")
+                    rst = reconcile_lists(list_a, list_b)
+                    rich.print(rst)
+                    if len(rst["exact_matches"]) == 0 and len(rst["combo_matches_a_to_b"]) == 0 and len(rst["combo_matches_b_to_a"]) == 0 and len(rst["unmatched_a"]) == 0 and len(rst["unmatched_b"]) == 0:
+                        print(group1, group2, group3)
+                        exit_flag = True
+                        break
         # 对账逻辑
         # result = self.reconcile(part_a_data, part_b_data)
 
