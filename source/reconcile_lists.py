@@ -167,3 +167,9 @@ if __name__ == "__main__":
     list_b = [10.0, 20.0, 30.0, 40.0, 65]
     result = reconcile_lists(list_a, list_b)
     rich.print(result)
+
+    # 测试案例4: 一边完全为空
+    list_a = [10.0, 20.0, 30.0, 40.0, 65]
+    list_b = []
+    result = reconcile_lists(list_a, list_b)
+    rich.print(result)
