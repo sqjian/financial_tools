@@ -7,12 +7,16 @@ def load_excel_to_table(file_path, sheet_name, table_name):
 
     # 使用 f-string 动态构建 SQL 查询
     query = f"""
-    CREATE OR REPLACE TABLE {table_name} AS
-    SELECT 
-        *
-    FROM
-        read_xlsx('{file_path}', sheet = '{sheet_name}');
-    """
+CREATE OR REPLACE TABLE {table_name} AS
+
+SELECT
+	ROW_NUMBER() OVER () as id,
+	*
+FROM
+	read_xlsx('{file_path}',sheet = '{sheet_name}');
+
+ALTER TABLE {table_name} ADD PRIMARY KEY (id);
+"""
 
     # 执行 SQL 查询
     conn.sql(query.strip())
