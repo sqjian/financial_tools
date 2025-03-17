@@ -173,3 +173,9 @@ if __name__ == "__main__":
     list_b = []
     result = reconcile_lists(list_a, list_b)
     rich.print(result)
+
+    # 测试案例5: 两遍双向匹配
+    list_a = [45.0, 65]
+    list_b = [105, 5]
+    result = reconcile_lists(list_a, list_b)
+    rich.print(result)
